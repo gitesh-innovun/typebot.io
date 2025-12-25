@@ -260,6 +260,62 @@ const googleFontsEnv = {
   },
 };
 
+const brandingEnv = {
+  client: {
+    NEXT_PUBLIC_BRAND_NAME: z.string().optional().default("Typebot"),
+    NEXT_PUBLIC_BRAND_DISPLAY_NAME: z.string().optional().default("Typebot"),
+    NEXT_PUBLIC_BRAND_TAGLINE: z
+      .string()
+      .optional()
+      .default("Build powerful chatbots visually"),
+    NEXT_PUBLIC_BRAND_DESCRIPTION: z
+      .string()
+      .optional()
+      .default("Create and publish conversational forms"),
+    NEXT_PUBLIC_BRAND_PRIMARY_COLOR: z.string().optional().default("#FF5925"),
+    NEXT_PUBLIC_COMPANY_NAME: z.string().optional().default("Typebot"),
+    NEXT_PUBLIC_SUPPORT_EMAIL: z.string().optional().default(""),
+  },
+  runtimeEnv: {
+    NEXT_PUBLIC_BRAND_NAME: getRuntimeVariable("NEXT_PUBLIC_BRAND_NAME"),
+    NEXT_PUBLIC_BRAND_DISPLAY_NAME: getRuntimeVariable(
+      "NEXT_PUBLIC_BRAND_DISPLAY_NAME",
+    ),
+    NEXT_PUBLIC_BRAND_TAGLINE: getRuntimeVariable("NEXT_PUBLIC_BRAND_TAGLINE"),
+    NEXT_PUBLIC_BRAND_DESCRIPTION: getRuntimeVariable(
+      "NEXT_PUBLIC_BRAND_DESCRIPTION",
+    ),
+    NEXT_PUBLIC_BRAND_PRIMARY_COLOR: getRuntimeVariable(
+      "NEXT_PUBLIC_BRAND_PRIMARY_COLOR",
+    ),
+    NEXT_PUBLIC_COMPANY_NAME: getRuntimeVariable("NEXT_PUBLIC_COMPANY_NAME"),
+    NEXT_PUBLIC_SUPPORT_EMAIL: getRuntimeVariable("NEXT_PUBLIC_SUPPORT_EMAIL"),
+  },
+};
+
+const billingEnv = {
+  server: {
+    DISABLE_BILLING: boolean.optional().default("false"),
+    BILLING_MODE: z
+      .enum(["STRIPE", "UNLIMITED", "CUSTOM"])
+      .optional()
+      .default("STRIPE"),
+  },
+  client: {
+    NEXT_PUBLIC_DISABLE_BILLING: boolean.optional().default("false"),
+    NEXT_PUBLIC_BILLING_MODE: z
+      .enum(["STRIPE", "UNLIMITED", "CUSTOM"])
+      .optional()
+      .default("STRIPE"),
+  },
+  runtimeEnv: {
+    NEXT_PUBLIC_DISABLE_BILLING: getRuntimeVariable(
+      "NEXT_PUBLIC_DISABLE_BILLING",
+    ),
+    NEXT_PUBLIC_BILLING_MODE: getRuntimeVariable("NEXT_PUBLIC_BILLING_MODE"),
+  },
+};
+
 const stripeEnv = {
   server: {
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
@@ -467,6 +523,7 @@ export const env = createEnv({
     ...smtpEnv.server,
     ...googleAuthEnv.server,
     ...googleSheetsEnv.server,
+    ...billingEnv.server,
     ...stripeEnv.server,
     ...s3Env.server,
     ...vercelEnv.server,
@@ -487,6 +544,8 @@ export const env = createEnv({
     ...smtpEnv.client,
     ...googleSheetsEnv.client,
     ...googleFontsEnv.client,
+    ...brandingEnv.client,
+    ...billingEnv.client,
     ...stripeEnv.client,
     ...giphyEnv.client,
     ...vercelEnv.client,
@@ -501,6 +560,8 @@ export const env = createEnv({
     ...smtpEnv.runtimeEnv,
     ...googleSheetsEnv.runtimeEnv,
     ...googleFontsEnv.runtimeEnv,
+    ...brandingEnv.runtimeEnv,
+    ...billingEnv.runtimeEnv,
     ...stripeEnv.runtimeEnv,
     ...giphyEnv.runtimeEnv,
     ...vercelEnv.runtimeEnv,

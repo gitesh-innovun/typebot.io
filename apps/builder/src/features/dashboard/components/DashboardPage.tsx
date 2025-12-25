@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useTranslate } from "@tolgee/react";
+import { isBillingEnabled } from "@typebot.io/billing/helpers/isBillingEnabled";
 import type { Plan } from "@typebot.io/prisma/enum";
 import { LoaderCircleIcon } from "@typebot.io/ui/icons/LoaderCircleIcon";
 import { useRouter } from "next/router";
@@ -59,7 +60,7 @@ export const DashboardPage = () => {
     <div className="flex flex-col gap-2 min-h-screen">
       <Seo title={workspace?.name ?? t("dashboard.title")} />
       <DashboardHeader />
-      {!workspace?.stripeId && (
+      {isBillingEnabled() && !workspace?.stripeId && (
         <PreCheckoutDialog
           selectedSubscription={preCheckoutPlan}
           existingEmail={user?.email ?? undefined}

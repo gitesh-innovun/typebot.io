@@ -11,12 +11,12 @@
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#FF5925",
-    "light": "#FF5925",
-    "dark": "#FF5925",
+    "primary": "#04ce56",
+    "light": "#04ce56",
+    "dark": "#04ce56",
     "background": {
-      "light": "#F1F1F1",
-      "dark": "#1A1A1A"
+      "light": "#04ce56",
+      "dark": "#04ce56"
     }
   },
   "font": {

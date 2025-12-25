@@ -109,6 +109,7 @@ export const defaultInputsShadow = {
 
 // Host avatar
 export const defaultHostAvatarIsEnabled = true;
+export const defaultHostAvatarUrl = "/images/logo.png";
 
 // Guest avatar
 export const defaultGuestAvatarIsEnabled = false;

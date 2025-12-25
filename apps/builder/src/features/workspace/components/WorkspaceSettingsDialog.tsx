@@ -1,4 +1,5 @@
 import { useTranslate } from "@tolgee/react";
+import { isBillingEnabled } from "@typebot.io/billing/helpers/isBillingEnabled";
 import { Avatar } from "@typebot.io/ui/components/Avatar";
 import { Button } from "@typebot.io/ui/components/Button";
 import { Dialog } from "@typebot.io/ui/components/Dialog";
@@ -119,7 +120,7 @@ export const WorkspaceSettingsDialog = ({
                   {t("workspace.settings.modal.menu.members.label")}
                 </Button>
               )}
-              {currentUserMode === "write" && (
+              {currentUserMode === "write" && isBillingEnabled() && (
                 <Button
                   variant={selectedTab === "billing" ? "outline" : "ghost"}
                   onClick={() => setSelectedTab("billing")}

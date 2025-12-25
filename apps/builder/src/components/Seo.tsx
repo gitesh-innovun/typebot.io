@@ -1,3 +1,4 @@
+import { brandConfig } from "@typebot.io/branding";
 import { env } from "@typebot.io/env";
 import Head from "next/head";
 
@@ -11,7 +12,7 @@ const getOrigin = () => {
 
 export const Seo = ({
   title,
-  description = "Create and publish conversational forms that collect 4 times more answers and feel native to your product",
+  description = brandConfig.description,
   imagePreviewUrl = `${getOrigin()}/images/og.png`,
 }: {
   title: string;
@@ -19,13 +20,14 @@ export const Seo = ({
   currentUrl?: string;
   imagePreviewUrl?: string;
 }) => {
-  const formattedTitle = `${title} | Typebot`;
+  const formattedTitle = `${title} | ${brandConfig.displayName}`;
 
   return (
     <Head>
       <title>{formattedTitle}</title>
       <meta name="title" content={title} />
       <meta property="og:title" content={title} />
+      <meta property="og:site_name" content={brandConfig.displayName} />
       <meta property="twitter:title" content={title} />
 
       <meta name="description" content={description} />
@@ -37,6 +39,8 @@ export const Seo = ({
 
       <meta property="og:type" content="website" />
       <meta property="twitter:card" content="summary_large_image" />
+
+      <meta name="theme-color" content={brandConfig.colors.primary} />
     </Head>
   );
 };

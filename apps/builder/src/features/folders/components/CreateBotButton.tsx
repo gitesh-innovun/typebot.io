@@ -1,4 +1,5 @@
 import { useTranslate } from "@tolgee/react";
+import { brandConfig } from "@typebot.io/branding";
 import { Button, type ButtonProps } from "@typebot.io/ui/components/Button";
 import { PlusSignIcon } from "@typebot.io/ui/icons/PlusSignIcon";
 import { cn } from "@typebot.io/ui/lib/cn";
@@ -28,12 +29,18 @@ export const CreateBotButton = ({
         "px-6 whitespace-normal w-[225px] h-[270px] [&_svg]:size-10",
         draggedTypebot && "opacity-30",
       )}
+      style={{
+        backgroundColor: brandConfig.colors.primary,
+        borderColor: brandConfig.colors.primary,
+      }}
       {...props}
     >
       <div className="flex flex-col items-center gap-6">
         <PlusSignIcon />
         <p className="font-medium max-w-40 text-center mt-6 text-lg">
-          {t("folders.createTypebotButton.label")}
+          {t("folders.createTypebotButton.label", {
+            botName: brandConfig.name,
+          })}
         </p>
       </div>
     </Button>

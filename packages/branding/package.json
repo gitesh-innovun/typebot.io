@@ -1,0 +1,21 @@
+{
+  "name": "@typebot.io/branding",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./src/config.ts",
+    "./constants": "./src/constants.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./theme/*": "./src/theme/*.ts",
+    "./utils/*": "./src/utils/*.ts"
+  },
+  "dependencies": {
+    "@typebot.io/env": "workspace:*",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@typebot.io/tsconfig": "workspace:*"
+  }
+}

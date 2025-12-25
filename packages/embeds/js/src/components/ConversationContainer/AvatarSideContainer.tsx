@@ -1,3 +1,4 @@
+import { defaultHostAvatarUrl } from "@typebot.io/theme/constants";
 import { isChatContainerLight } from "@typebot.io/theme/helpers/isChatContainerLight";
 import type { Theme } from "@typebot.io/theme/schemas";
 import { cx } from "@typebot.io/ui/lib/cva";
@@ -50,7 +51,7 @@ export const AvatarSideContainer = (props: Props) => {
         }}
       >
         <Avatar
-          src={props.theme.chat?.hostAvatar?.url}
+          src={props.theme.chat?.hostAvatar?.url ?? defaultHostAvatarUrl}
           isChatContainerLight={isChatContainerLight({
             chatContainer: props.theme.chat?.container,
             generalBackground: props.theme.general?.background,
