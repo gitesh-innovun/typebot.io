@@ -27,12 +27,12 @@ audio::-webkit-media-controls-panel {
 /* Brand color overrides from environment config */
 :root {
   /* Brand primary color - InnoBot green */
-  --color-orange-500: oklch(0.75 0.18 150); /* #000000 */
+  --color-orange-500: oklch(0.75 0.18 150); /* #04ce56 */
   --primary: oklch(0.75 0.18 150);
 }
 
 .dark {
   /* Slightly darker version for dark mode */
-  --color-orange-600: oklch(0.68 0.18 150); /* #03b94d */
+  --color-orange-600: oklch(0.68 0.18 150); /* #04ce56 */
   --primary: oklch(0.68 0.18 150);
 }

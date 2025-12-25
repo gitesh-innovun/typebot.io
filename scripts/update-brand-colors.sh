@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Update Brand Colors Script
+# Update Brand Colors Script - IMPROVED VERSION
 # This script updates all brand color references based on .env configuration
+# It now works regardless of what color is currently in the files!
 #
 # Usage:
 #   chmod +x scripts/update-brand-colors.sh
@@ -20,7 +21,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo "================================================"
-echo "🎨 Updating Brand Colors"
+echo "🎨 Updating Brand Colors (Improved Script)"
 echo "================================================"
 echo ""
 
@@ -67,22 +68,6 @@ hex_to_rgb() {
     printf "rgb(%d %d %d)" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
 }
 
-# Function to lighten color
-lighten_color() {
-    local hex=$1
-    local factor=$2
-    hex=${hex#"#"}
-    local r=$((0x${hex:0:2}))
-    local g=$((0x${hex:2:2}))
-    local b=$((0x${hex:4:2}))
-
-    r=$(( r + (255 - r) * factor / 100 ))
-    g=$(( g + (255 - g) * factor / 100 ))
-    b=$(( b + (255 - b) * factor / 100 ))
-
-    printf "#%02x%02x%02x" $r $g $b
-}
-
 # Function to darken color
 darken_color() {
     local hex=$1
@@ -102,10 +87,11 @@ darken_color() {
 # Generate color variations
 PRIMARY_RGB=$(hex_to_rgb "$BRAND_PRIMARY_COLOR")
 PRIMARY_DARK=$(darken_color "$BRAND_PRIMARY_COLOR" 10)
+PRIMARY_DARK_RGB=$(hex_to_rgb "$PRIMARY_DARK")
 
 echo -e "${BLUE}Generated color variations:${NC}"
 echo "  Primary: $BRAND_PRIMARY_COLOR ($PRIMARY_RGB)"
-echo "  Dark: $PRIMARY_DARK"
+echo "  Dark: $PRIMARY_DARK ($PRIMARY_DARK_RGB)"
 echo ""
 
 # Backup files before modification
@@ -118,7 +104,6 @@ backup_file() {
         local backup_path="$BACKUP_DIR/$file"
         mkdir -p "$(dirname "$backup_path")"
         cp "$file" "$backup_path"
-        echo -e "${GREEN}  ✓ Backed up: $file${NC}"
     fi
 }
 
@@ -128,54 +113,66 @@ backup_file "packages/ui/src/colors.css"
 backup_file "apps/builder/src/assets/styles/custom.css"
 backup_file "apps/docs/mint.json"
 backup_file ".env"
+echo -e "${GREEN}  ✓ Backups created${NC}"
 echo ""
 
 # Update files
 echo -e "${BLUE}Updating color values...${NC}"
 
-# Update packages/ui/src/colors.ts
+# 1. Update packages/ui/src/colors.ts - Use line-based replacement
 if [ -f "packages/ui/src/colors.ts" ]; then
-    # Replace all instances of the old green color
-    sed -i "s/#04ce56/$BRAND_PRIMARY_COLOR/g" packages/ui/src/colors.ts
-    sed -i "s/#03b54a/$PRIMARY_DARK/g" packages/ui/src/colors.ts
+    # Replace line 42 (light mode orange-9)
+    sed -i '42s/9: "#[0-9A-Fa-f]\{6\}",/9: "'"$BRAND_PRIMARY_COLOR"'",/' packages/ui/src/colors.ts
+    # Replace line 43 (light mode orange-10)
+    sed -i '43s/10: "#[0-9A-Fa-f]\{6\}",/10: "'"$PRIMARY_DARK"'",/' packages/ui/src/colors.ts
+    # Replace line 56 (dark mode orange-9)
+    sed -i '56s/9: "#[0-9A-Fa-f]\{6\}",/9: "'"$BRAND_PRIMARY_COLOR"'",/' packages/ui/src/colors.ts
+    # Replace line 57 (dark mode orange-10)
+    sed -i '57s/10: "#[0-9A-Fa-f]\{6\}",/10: "'"$PRIMARY_DARK"'",/' packages/ui/src/colors.ts
     echo -e "${GREEN}  ✓ packages/ui/src/colors.ts${NC}"
 fi
 
-# Update packages/ui/src/colors.css
+# 2. Update packages/ui/src/colors.css - Use line-based replacement
 if [ -f "packages/ui/src/colors.css" ]; then
-    sed -i "s/rgb(4 206 86)/$PRIMARY_RGB/g" packages/ui/src/colors.css
-    sed -i "s/rgb(3 181 74)/$(hex_to_rgb "$PRIMARY_DARK")/g" packages/ui/src/colors.css
+    # Light mode orange-9 (line 25)
+    sed -i '25s/--orange-9: rgb([0-9 ]\+);/--orange-9: '"$PRIMARY_RGB"';/' packages/ui/src/colors.css
+    # Light mode orange-10 (line 26)
+    sed -i '26s/--orange-10: rgb([0-9 ]\+);/--orange-10: '"$PRIMARY_DARK_RGB"';/' packages/ui/src/colors.css
+    # Dark mode orange-9 (line 106)
+    sed -i '106s/--orange-9: rgb([0-9 ]\+);/--orange-9: '"$PRIMARY_RGB"';/' packages/ui/src/colors.css
+    # Dark mode orange-10 (line 107)
+    sed -i '107s/--orange-10: rgb([0-9 ]\+);/--orange-10: '"$PRIMARY_DARK_RGB"';/' packages/ui/src/colors.css
     echo -e "${GREEN}  ✓ packages/ui/src/colors.css${NC}"
 fi
 
-# Update apps/builder/src/assets/styles/custom.css
+# 3. Update apps/builder/src/assets/styles/custom.css - Update comments
 if [ -f "apps/builder/src/assets/styles/custom.css" ]; then
-    sed -i "s|/\* #04ce56 \*/|/* $BRAND_PRIMARY_COLOR */|g" apps/builder/src/assets/styles/custom.css
-    sed -i "s|/\* #03b54a \*/|/* $PRIMARY_DARK */|g" apps/builder/src/assets/styles/custom.css
+    sed -i "s|/\* #[0-9A-Fa-f]\{6\} \*/|/* $BRAND_PRIMARY_COLOR */|g" apps/builder/src/assets/styles/custom.css
     echo -e "${GREEN}  ✓ apps/builder/src/assets/styles/custom.css${NC}"
 fi
 
-# Update apps/docs/mint.json
+# 4. Update apps/docs/mint.json - Replace all color instances
 if [ -f "apps/docs/mint.json" ]; then
-    # Replace any existing primary colors
-    sed -i "s/\"primary\": \"#[0-9A-Fa-f]\{6\}\"/\"primary\": \"$BRAND_PRIMARY_COLOR\"/g" apps/docs/mint.json
-    sed -i "s/\"light\": \"#[0-9A-Fa-f]\{6\}\"/\"light\": \"$BRAND_PRIMARY_COLOR\"/g" apps/docs/mint.json
-    sed -i "s/\"dark\": \"#[0-9A-Fa-f]\{6\}\"/\"dark\": \"$BRAND_PRIMARY_COLOR\"/g" apps/docs/mint.json
+    # Use jq if available for safe JSON manipulation, otherwise use sed
+    if command -v jq &> /dev/null; then
+        jq --arg color "$BRAND_PRIMARY_COLOR" \
+           '.colors.primary = $color | .colors.light = $color | .colors.dark = $color' \
+           apps/docs/mint.json > apps/docs/mint.json.tmp && mv apps/docs/mint.json.tmp apps/docs/mint.json
+    else
+        # Fallback to sed
+        sed -i 's/"primary": "#[0-9A-Fa-f]\{6\}"/"primary": "'"$BRAND_PRIMARY_COLOR"'"/' apps/docs/mint.json
+        sed -i 's/"light": "#[0-9A-Fa-f]\{6\}"/"light": "'"$BRAND_PRIMARY_COLOR"'"/' apps/docs/mint.json
+        sed -i 's/"dark": "#[0-9A-Fa-f]\{6\}"/"dark": "'"$BRAND_PRIMARY_COLOR"'"/' apps/docs/mint.json
+    fi
     echo -e "${GREEN}  ✓ apps/docs/mint.json${NC}"
 fi
 
-# Update .env file
+# 5. Update .env file
 if [ -f ".env" ]; then
     if grep -q "^NEXT_PUBLIC_BRAND_PRIMARY_COLOR=" .env; then
         sed -i "s/^NEXT_PUBLIC_BRAND_PRIMARY_COLOR=.*/NEXT_PUBLIC_BRAND_PRIMARY_COLOR=$BRAND_PRIMARY_COLOR/" .env
     else
         echo "NEXT_PUBLIC_BRAND_PRIMARY_COLOR=$BRAND_PRIMARY_COLOR" >> .env
-    fi
-
-    if grep -q "^BRAND_PRIMARY_COLOR=" .env; then
-        sed -i "s/^BRAND_PRIMARY_COLOR=.*/BRAND_PRIMARY_COLOR=$BRAND_PRIMARY_COLOR/" .env
-    else
-        echo "BRAND_PRIMARY_COLOR=$BRAND_PRIMARY_COLOR" >> .env
     fi
     echo -e "${GREEN}  ✓ .env${NC}"
 fi
@@ -187,13 +184,17 @@ echo "================================================"
 echo ""
 echo "Backups created in: $BACKUP_DIR"
 echo ""
-echo -e "${YELLOW}⚠️  Next steps:${NC}"
-echo "1. Restart your dev servers:"
-echo "   ${BLUE}bun run dev${NC}"
+echo -e "${YELLOW}⚠️  IMPORTANT - Next steps:${NC}"
 echo ""
-echo "2. Hard refresh your browser:"
-echo "   ${BLUE}Ctrl+Shift+R (or Cmd+Shift+R on Mac)${NC}"
+echo "1. ${BLUE}Restart your dev servers:${NC}"
+echo "   Stop current servers (Ctrl+C), then:"
+echo "   ${GREEN}bun run dev${NC}"
 echo ""
-echo "3. For production, rebuild:"
-echo "   ${BLUE}bun run build${NC}"
+echo "2. ${BLUE}Hard refresh your browser:${NC}"
+echo "   ${GREEN}Ctrl+Shift+R${NC} (or Cmd+Shift+R on Mac)"
+echo ""
+echo "3. ${BLUE}For production:${NC}"
+echo "   ${GREEN}bun run build${NC}"
+echo ""
+echo "Color applied: ${GREEN}$BRAND_PRIMARY_COLOR${NC}"
 echo ""
